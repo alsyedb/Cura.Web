@@ -1,0 +1,22 @@
+﻿@model IEnumerable<Cura.Web.Models.Patient>
+@{
+    ViewData["Title"] = "Patients";
+}
+<h2 class="mb-3">Patients</h2>
+<table class="table table-striped">
+    <thead>
+        <tr><th>Name</th><th>Gender</th><th>Birth Date</th><th></th></tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+@*                 <td>@p.Id</td>
+ *@                <td>@p.FullName</td>
+                <td>@p.Gender</td>
+                <td>@p.BirthDate.ToString("yyyy-MM-dd")</td>
+                <td><a class="btn btn-primary btn-sm" href="@Url.Action("Details","Patients", new { id = p.Id })">Open</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

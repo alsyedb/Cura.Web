@@ -1,0 +1,330 @@
+﻿@model Cura.Web.Models.PatientDetailsVM
+@{
+    var p = Model.Selected!;
+    ViewData["Title"] = "Patient";
+}
+
+<style>
+    :root {
+        --cura-green: #12B886; /* main Cura brand green */
+        --cura-green-600: #0FA678;
+        --cura-green-700: #0C8D65;
+        --cura-mint: #E9FBF4; /* light mint background */
+        --cura-ink: #0F172A; /* dark text */
+        --cura-muted: #6B7280; /* secondary text */
+        --surface: #FFFFFF;
+        --surface-2: #F8FAFC;
+        --border: #E5E7EB;
+        --shadow: 0 10px 24px rgba(18,184,134,.15);
+    }
+
+
+
+    /* page wrapper */
+    .cura-shell {
+        display: flex;
+        gap: 18px;
+        background: linear-gradient(180deg, var(--cura-mint), #fff 60%);
+        padding: 12px 12px 24px;
+        border-radius: 18px;
+    }
+
+    /* left sidebar */
+    .chat-sidebar {
+        width: 300px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        height: calc(100vh - 160px);
+        position: sticky;
+        top: 16px;
+        overflow: auto;
+    }
+
+    .sidebar-head {
+        padding: 16px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, #ffffff 0%, #F4FFFA 100%);
+        border-top-left-radius: 16px;
+        border-top-right-radius: 16px;
+    }
+
+    .cura-badge {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: radial-gradient(60% 80% at 30% 20%, #38E1B0 0%, #12B886 60%, #0C8D65 100%);
+        box-shadow: 0 6px 12px rgba(18,184,134,.35);
+    }
+
+    .brand {
+        font-weight: 800;
+        letter-spacing: .3px;
+        color: var(--cura-green-700);
+    }
+
+    .patients-list {
+        padding: 10px;
+    }
+
+    .chat-item {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: var(--cura-ink);
+        border: 1px solid transparent;
+    }
+
+        .chat-item:hover {
+            background: #F6FFFB;
+            border-color: #D7F5EA;
+        }
+
+        .chat-item.active {
+            background: #E9FBF4;
+            border-color: #BFF3E3;
+        }
+
+    /* right pane */
+    .chat-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+    }
+
+    .card-header {
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .card-body {
+        padding: 18px;
+    }
+
+    /* header info */
+    .pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: #F1FFF9;
+        color: var(--cura-green-700);
+        border: 1px solid #CFF6EA;
+        font-size: .8rem;
+        font-weight: 600;
+    }
+
+    /* input bar */
+    .ask-bar {
+        display: flex;
+        gap: 8px;
+    }
+
+    .ask-input {
+        flex: 1;
+        border: 1.5px solid var(--border);
+        border-radius: 12px;
+        padding: 12px 14px;
+        outline: none;
+        background: var(--surface-2);
+    }
+
+    .btn-cura {
+        background: linear-gradient(135deg, var(--cura-green), var(--cura-green-700));
+        color: #fff;
+        border: none;
+        padding: 12px 16px;
+        border-radius: 12px;
+        font-weight: 700;
+        box-shadow: 0 8px 16px rgba(18,184,134,.25);
+    }
+
+        .btn-cura:hover {
+            filter: brightness(.98);
+        }
+
+    .btn-ghost {
+        border: 1px solid #CDEFE4;
+        color: var(--cura-green-700);
+        background: #F6FFFB;
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+
+        .btn-ghost:hover {
+            background: #E9FBF4;
+        }
+
+    /* markdown / AI output */
+    #aiOut {
+        min-height: 140px;
+    }
+
+    .markdown-body {
+        line-height: 1.6;
+        color: var(--cura-ink);
+    }
+
+        .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+            margin: .6rem 0 .3rem;
+        }
+
+        .markdown-body p {
+            margin: .3rem 0 .6rem;
+        }
+
+        .markdown-body ul {
+            margin: .4rem 0 .6rem 1.1rem;
+        }
+
+        .markdown-body strong {
+            color: #0C815F;
+        }
+
+        .markdown-body code, .markdown-body pre {
+            background: #F6FFFB;
+            border: 1px dashed #CDEFE4;
+            padding: 3px 6px;
+            border-radius: 8px;
+        }
+
+    /* tiny helper */
+    .muted {
+        color: var(--cura-muted);
+    }
+</style>
+
+<div class="cura-shell">
+    <!-- LEFT: patients list -->
+    <aside class="chat-sidebar">
+        <div class="sidebar-head">
+            <div class="cura-badge"></div>
+            <div>
+                <div class="brand">Cura</div>
+                <div class="muted" style="font-size:.85rem">AI Clinical Assistant</div>
+            </div>
+        </div>
+        <div class="patients-list">
+            @foreach (var item in Model.Patients)
+            {
+                var active = item.Id == p.Id ? "active" : "";
+                <a class="chat-item @active" href="@Url.Action("Details","Patients", new { id = item.Id })">
+                    <div class="fw-semibold">@item.FullName</div>
+@*                     <div class="muted small">@item.Id</div>
+ *@                </a>
+            }
+            <a class="btn-ghost w-100" href="@Url.Action("Index","Patients")">All Patients</a>
+        </div>
+    </aside>
+
+    <!-- RIGHT: selected patient + Ask AI -->
+    <main class="chat-main">
+        <section class="card">
+            <div class="card-header">
+                <h3 class="m-0">@p.FullName @* <small class="muted">(@p.Id)</small> *@
+                    </h3>
+            </div>
+            <div class="card-body">
+                <p class="muted">
+                    <span class="pill">Gender: @p.Gender</span>
+                    <span class="pill">DOB: @p.BirthDate</span>
+                </p>
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h5>Problems</h5>
+                        <ul>
+                            @foreach (var c in p.Conditions)
+                            {
+                                <li>@c.Name</li>
+                            }
+                        </ul>
+
+                        <h5>Medications</h5>
+                        <ul>
+                            @foreach (var m in p.Medications)
+                            {
+                                <li>@m.Name</li>
+                            }
+                        </ul>
+
+                        <h5>Recent Observations</h5>
+                        <ul>
+                            @foreach (var o in p.Observations)
+                            {
+                                <li><strong>@o.Code</strong>: @o.Value (@o.Date:yyyy-MM-dd) [@o.RefId]</li>
+                            }
+                        </ul>
+
+                        <h5>Last Note</h5>
+                        <p>@p.LastNote</p>
+                    </div>
+
+                    <div class="col-lg-6">
+                        <h4 class="mb-2">Ask AI</h4>
+                        <div class="ask-bar mb-2">
+                            <input id="q" class="ask-input" placeholder="Ask about this patient (e.g., summarize chart, draft SOAP…)" />
+                            <button id="askBtn" class="btn-cura">Ask</button>
+                        </div>
+                        <div class="mb-2" style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="btn-ghost" onclick="prefill('Summarize the chart and draft a SOAP note with references.')">Suggest SOAP</button>
+                            <button class="btn-ghost" onclick="prefill('List abnormal labs with references and follow-up suggestions.')">Abnormal Labs</button>
+                        </div>
+
+                        <div id="aiOut" class="card" style="border-style:dashed;">
+                            <div class="card-body">
+                                <div class="markdown-body" id="aiMd">Ask Cura to get started.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+@section Scripts {
+    <script>
+        const pid = "@p.Id";
+        function prefill(t){ document.getElementById('q').value = t; }
+
+        const askBtn = document.getElementById('askBtn');
+        const out = document.getElementById('aiMd');
+
+        askBtn.addEventListener('click', async () => {
+          const question = document.getElementById('q').value || 'Summarize the chart and draft a SOAP note with references.';
+          const spinner = "🟢 Thinking…";
+          out.innerHTML = spinner;
+
+          try {
+            const resp = await fetch('@Url.Action("Ask", "Patients")', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: new URLSearchParams({ id: pid, question })
+            });
+            const data = await resp.json();
+            if (data.ok) {
+              // server returns Markdown rendered to HTML (Markdig) → drop it in
+              out.innerHTML = data.answer;
+            } else {
+              out.innerHTML = "<span class='text-danger'>AI error: " + data.error + "</span>";
+            }
+          } catch(e) {
+            out.innerHTML = "<span class='text-danger'>Request failed: " + e + "</span>";
+          }
+        });
+    </script>
+}
